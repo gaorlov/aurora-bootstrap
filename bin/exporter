@@ -9,9 +9,9 @@ bukkit             = ENV.fetch "EXPORT_BUCKET"
 blacklisted_tables = ENV.fetch "BLACKLISTED_TABLES", ""
 blacklisted_fields = ENV.fetch "BLACKLISTED_FIELDS", ""
 
-client    = Mysql2::Client.new( host: ENV.fetch( "DB_USER" ),
-                            username: ENV.fetch( "DB_PASS" ),
-                            password: ENV.fetch( "DB_HOST" ))
+client    = Mysql2::Client.new( host: ENV.fetch( "DB_HOST" ),
+                            username: ENV.fetch( "DB_USER" ),
+                            password: ENV.fetch( "DB_PASS" ))
 
 AuroraBootstrapper::Exporter.new( client: client,
                                   prefix: prefix,
