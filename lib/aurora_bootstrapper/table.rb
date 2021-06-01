@@ -10,7 +10,6 @@ module AuroraBootstrapper
       d = DateTime.now
       d_str = d.strftime("%Y-%m-%d")
       @export_date        = ENV.fetch( 'EXPORT_DATE', d_str )
-      @region             = ENV.fetch( 'REGION', 'us-west-2')
       @s3_client          = s3_client
     end
 

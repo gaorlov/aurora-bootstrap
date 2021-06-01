@@ -74,7 +74,6 @@ class TableTest < Minitest::Test
   end
 
   def test_export_logs
-    @table.instance_variable_set(:@region, 'us-west-2')
     with_logger PutsLogger.new do
       assert_output( /Export statement/ ) do
         @table.export!( into_bucket: "s3://bukkit")
@@ -120,8 +119,6 @@ class TableTest < Minitest::Test
   end
 
   def test_export
-    @table.instance_variable_set(:@region, 'us-west-2')
-
     # because those logs aren't actually useful
     with_nil_logger do
 

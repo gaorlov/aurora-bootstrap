@@ -11,6 +11,7 @@ module AuroraBootstrapper
       @whitelisted_tables = whitelisted_tables.split(",")
       @blacklisted_fields = blacklisted_fields.split(",")
       @client             = client
+      @region             = ENV.fetch( 'REGION', 'us-west-2')
     end
 
     def export!
