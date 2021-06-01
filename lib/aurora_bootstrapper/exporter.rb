@@ -4,14 +4,14 @@ module AuroraBootstrapper
   class Exporter
     attr_reader :client
 
-    def initialize( client:, prefix: "", export_bucket:, blacklisted_tables: "", whitelisted_tables: "", blacklisted_fields: "" )
+    def initialize( client:, prefix: "", export_bucket:, blacklisted_tables: "", whitelisted_tables: "", blacklisted_fields: "", s3_client: nil )
       @match              = "#{prefix}.*"
       @export_bucket      = export_bucket
       @blacklisted_tables = blacklisted_tables.split(",")
       @whitelisted_tables = whitelisted_tables.split(",")
       @blacklisted_fields = blacklisted_fields.split(",")
       @client             = client
-      @region             = ENV.fetch( 'REGION', 'us-west-2')
+      @s3_client          = s3_client
     end
 
     def export!
@@ -23,7 +23,8 @@ module AuroraBootstrapper
                                          client: @client,
                              blacklisted_tables: @blacklisted_tables,
                              whitelisted_tables: @whitelisted_tables,
-                             blacklisted_fields: @blacklisted_fields
+                             blacklisted_fields: @blacklisted_fields,
+                             s3_client: s3_client
           database.export! into_bucket: @export_bucket
         rescue => e
           AuroraBootstrapper.logger.error message: "Error in database #{database_name}", error: e
