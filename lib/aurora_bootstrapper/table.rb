@@ -66,7 +66,10 @@ module AuroraBootstrapper
 
       # export state to S3
       index = into_bucket.rindex('/')
-      into_bucket = into_bucket[5..index-1]
+      if index > 5
+        into_bucket = into_bucket[5..index-1]
+      else
+        into_bucket = into_bucket[5..-1]
       path = [into_bucket, @export_date, 'DONE.txt' ].compact.join('/')
       index = path.index('/')
       bucket_name = path[0, index]
