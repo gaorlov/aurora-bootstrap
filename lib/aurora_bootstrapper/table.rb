@@ -72,11 +72,11 @@ module AuroraBootstrapper
         into_bucket = into_bucket[5..-1]
       end
       path = [into_bucket, @export_date, 'DONE.txt' ].compact.join('/')
-      # index = path.index('/')
-      # bucket_name = path[0, index]
-      # s3_client = Aws::S3::Client.new(region: @region)
-      # object_key = path[index + 1..-1]
+      index = path.index('/')
+      bucket_name = path[0, index]
+      object_key = path[index + 1..-1]
 
+      # s3_client = Aws::S3::Client.new(region: @region)
       # if object_uploaded?(s3_client, bucket_name, object_key)
       #   puts "State '#{object_key}' uploaded to bucket '#{bucket_name}'."
       # else
