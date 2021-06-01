@@ -12,7 +12,7 @@ module AuroraBootstrapper
       # @export_date        = ENV.fetch( 'EXPORT_DATE', d_str )
       @export_date        = ENV.fetch( 'EXPORT_DATE', nil )
       @region             = ENV.fetch( 'REGION', 'us-west-2')
-      @s3_client          = Aws::S3::Client.new(region: @region)
+      # @s3_client          = Aws::S3::Client.new(region: @region)
     end
 
     def fields
@@ -77,11 +77,11 @@ module AuroraBootstrapper
       bucket_name = path[0, index]
       object_key = path[index + 1..-1]
 
-      # if object_uploaded?(@s3_client, bucket_name, object_key)
-      #   puts "State '#{object_key}' uploaded to bucket '#{bucket_name}'."
-      # else
-      #   puts "State '#{object_key}' not uploaded to bucket '#{bucket_name}'."
-      # end
+      if object_uploaded?(nil, bucket_name, object_key)
+        puts "State '#{object_key}' uploaded to bucket '#{bucket_name}'."
+      else
+        puts "State '#{object_key}' not uploaded to bucket '#{bucket_name}'."
+      end
 
       true
     rescue => e
