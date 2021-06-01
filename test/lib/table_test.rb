@@ -10,7 +10,7 @@ class TableTest < Minitest::Test
                                 username: ENV.fetch( "DB_USER" ),
                                 password: ENV.fetch( "DB_PASS" ))
 
-    @s3_client = Aws::S3::Client.new(region: 'us-west-2')
+    @s3_client = Aws::S3::Client.new(stub_responses: true)
 
     @exporter = AuroraBootstrapper::Exporter.new( client: @client,
                                                   prefix: @prefix,
