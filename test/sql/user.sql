@@ -1,3 +1,4 @@
+DROP USER 'root'@'%';
 CREATE USER 'root'@'%' IDENTIFIED BY 'root';
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost'
     WITH GRANT OPTION;

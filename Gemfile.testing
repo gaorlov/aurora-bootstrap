@@ -6,6 +6,7 @@ gem 'zeitwerk'
 # exporter
 gem 'connection_pool'
 gem 'mysql2'
+gem 'aws-sdk-s3'
 
 gem 'rollbar'
 gem 'multi_json'
