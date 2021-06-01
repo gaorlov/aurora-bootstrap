@@ -9,7 +9,6 @@ class TableTest < Minitest::Test
                                 username: ENV.fetch( "DB_USER" ),
                                 password: ENV.fetch( "DB_PASS" ))
 
-
     @exporter = AuroraBootstrapper::Exporter.new( client: @client,
                                                   prefix: @prefix,
                                            export_bucket: @bukkit )
@@ -119,6 +118,7 @@ class TableTest < Minitest::Test
     with_nil_logger do
 
       AuroraBootstrapper::Table.any_instance.stubs( :export_statement ).returns( "select 'hurrah'" )
+      AuroraBootstrapper::Table.any_instance.stubs( :object_uploaded? ).returns( true 
 
       assert @exporter.export!
 
