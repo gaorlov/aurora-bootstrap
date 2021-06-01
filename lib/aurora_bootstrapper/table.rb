@@ -65,26 +65,23 @@ module AuroraBootstrapper
       AuroraBootstrapper.logger.info( message:"Export succeeded: #{@database_name}.#{@table_name}" )
 
       # export state to S3
-      # index = into_bucket.rindex('/')
-      # if index > 5
-      #   into_bucket = into_bucket[5..index-1]
-      # else
-      #   into_bucket = into_bucket[5..-1]
-      # end
-      # path = [into_bucket, @export_date, 'DONE.txt' ].compact.join('/')
-      # index = path.index('/')
-      # bucket_name = path[0, index]
-      # s3_client = Aws::S3::Client.new(region: @region)
-      # object_key = path[index + 1..-1]
-
-      bucket_name = 'tmp'
-      object_key = 'tmp'
-
-      if object_uploaded?(s3_client, bucket_name, object_key)
-        puts "State '#{object_key}' uploaded to bucket '#{bucket_name}'."
+      index = into_bucket.rindex('/')
+      if index > 5
+        into_bucket = into_bucket[5..index-1]
       else
-        puts "State '#{object_key}' not uploaded to bucket '#{bucket_name}'."
+        into_bucket = into_bucket[5..-1]
       end
+      path = [into_bucket, @export_date, 'DONE.txt' ].compact.join('/')
+      index = path.index('/')
+      bucket_name = path[0, index]
+      s3_client = Aws::S3::Client.new(region: @region)
+      object_key = path[index + 1..-1]
+
+      # if object_uploaded?(s3_client, bucket_name, object_key)
+      #   puts "State '#{object_key}' uploaded to bucket '#{bucket_name}'."
+      # else
+      #   puts "State '#{object_key}' not uploaded to bucket '#{bucket_name}'."
+      # end
 
       true
     rescue => e
