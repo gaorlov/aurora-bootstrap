@@ -2,17 +2,16 @@
 
 module AuroraBootstrapper
   class Table
-    def initialize( database_name:, table_name:, client:, blacklisted_fields: [] )
+    def initialize( database_name:, table_name:, client:, blacklisted_fields: [], s3_client: nil )
       @blacklisted_fields = blacklisted_fields
       @database_name      = database_name
       @table_name         = table_name
       @client             = client
       d = DateTime.now
       d_str = d.strftime("%Y-%m-%d")
-      # @export_date        = ENV.fetch( 'EXPORT_DATE', d_str )
-      @export_date        = ENV.fetch( 'EXPORT_DATE', nil )
+      @export_date        = ENV.fetch( 'EXPORT_DATE', d_str )
       @region             = ENV.fetch( 'REGION', 'us-west-2')
-      # @s3_client          = Aws::S3::Client.new(region: @region)
+      @s3_client          = s3_client
     end
 
     def fields
@@ -77,7 +76,7 @@ module AuroraBootstrapper
       bucket_name = path[0, index]
       object_key = path[index + 1..-1]
 
-      if object_uploaded?(nil, bucket_name, object_key)
+      if object_uploaded?(@s3_client, bucket_name, object_key)
         puts "State '#{object_key}' uploaded to bucket '#{bucket_name}'."
       else
         puts "State '#{object_key}' not uploaded to bucket '#{bucket_name}'."
