@@ -1,3 +1,5 @@
+require 'aws-sdk-s3'
+
 module AuroraBootstrapper
   class Table
     def initialize( database_name:, table_name:, client:, blacklisted_fields: [] )
@@ -5,7 +7,10 @@ module AuroraBootstrapper
       @database_name      = database_name
       @table_name         = table_name
       @client             = client
-      @export_date        = ENV.fetch( 'EXPORT_DATE', nil )
+      d = DateTime.now
+      d_str = d.strftime("%Y-%m-%d")
+      @export_date        = ENV.fetch( 'EXPORT_DATE', d_str )
+      @region             = ENV.fetch( 'REGION', 'us-west-2')
     end
 
     def fields
@@ -57,6 +62,22 @@ module AuroraBootstrapper
       AuroraBootstrapper.logger.info( message:"Running: #{ export_statement( into_bucket: into_bucket ) }" )
       @client.query( export_statement( into_bucket: into_bucket ) )
       AuroraBootstrapper.logger.info( message:"Export succeeded: #{@database_name}.#{@table_name}" )
+
+      # export state to S3
+      index = into_bucket.rindex('/')
+      into_bucket = into_bucket[5..index-1]
+      path = [into_bucket, @export_date, 'DONE.txt' ].compact.join('/')
+      index = path.index('/')
+      bucket_name = path[0, index]
+      s3_client = Aws::S3::Client.new(region: @region)
+      object_key = path[index + 1..-1]
+
+      if object_uploaded?(s3_client, bucket_name, object_key)
+        puts "State '#{object_key}' uploaded to bucket '#{bucket_name}'."
+      else
+        puts "State '#{object_key}' not uploaded to bucket '#{bucket_name}'."
+      end
+
       true
     rescue => e
       AuroraBootstrapper.logger.fatal( mesasge: "Export statement '#{export_statement( into_bucket: into_bucket )}' failed", error: e )
@@ -72,6 +93,22 @@ module AuroraBootstrapper
           MANIFEST ON
           OVERWRITE ON
       SQL
+    end
+
+    def object_uploaded?(s3_client, bucket_name, object_key)
+      response = s3_client.put_object(
+        bucket: bucket_name,
+        key: object_key
+      )
+
+      if response.etag
+        true
+      else
+        false
+      end
+    rescue StandardError => e
+      puts "Error uploading object: #{e.message}"
+      false
     end
   end
 end

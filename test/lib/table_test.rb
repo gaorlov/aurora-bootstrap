@@ -118,7 +118,7 @@ class TableTest < Minitest::Test
     with_nil_logger do
 
       AuroraBootstrapper::Table.any_instance.stubs( :export_statement ).returns( "select 'hurrah'" )
-      AuroraBootstrapper::Table.any_instance.stubs( :object_uploaded? ).returns( true 
+      AuroraBootstrapper::Table.any_instance.stubs( :object_uploaded? ).returns( true )
 
       assert @exporter.export!
 
