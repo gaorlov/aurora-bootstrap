@@ -74,9 +74,9 @@ module AuroraBootstrapper
       bucket_name = path[0, index]
       object_key = path[index + 1..-1]
 
-      # if @s3_client.blank?
-      #   true
-      # end
+      if @s3_client.blank?
+        true
+      end
 
       # if object_uploaded?(@s3_client, bucket_name, object_key)
       #   puts "State '#{object_key}' uploaded to bucket '#{bucket_name}'."
