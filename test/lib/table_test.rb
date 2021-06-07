@@ -80,7 +80,7 @@ class TableTest < Minitest::Test
       end
 
       @client.stubs( :query ).returns( "yay" )
-      AuroraBootstrapper::Table.any_instance.stubs( :object_uploaded? ).returns( true )
+      @table.stubs( :object_uploaded? ).returns( true )
       assert_output( /Export succeeded: / ) do
         assert @table.export!( into_bucket: "s3://bukkit")
       end
