@@ -78,7 +78,7 @@ module AuroraBootstrapper
         if object_uploaded?(@s3_client, bucket_name, object_key)
           AuroraBootstrapper.logger.info( message: "State file has been uploaded to S3 bucket '#{bucket_name}/#{object_key}'." )
         else
-          AuroraBootstrapper.logger.info( message: "State file fails to be uploaded to S3 bucket '#{bucket_name}#{object_key}'." )
+          AuroraBootstrapper.logger.info( message: "State file fails in being uploaded to S3 bucket '#{bucket_name}#{object_key}'." )
         end
       end
 
@@ -110,8 +110,8 @@ module AuroraBootstrapper
       else
         false
       end
-    rescue StandardError => e
-      puts "Error uploading object: #{e.message}"
+    rescue => e
+      AuroraBootstrapper.logger.fatal( mesasge: "State file fails in being uploaded to S3 bucket '#{bucket_name}#{object_key}'.",  error: e )
       false
     end
   end
