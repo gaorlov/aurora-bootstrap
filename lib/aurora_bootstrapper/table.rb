@@ -29,7 +29,6 @@ module AuroraBootstrapper
         bl_table_name    = @table_name
         bl_database_name = @database_name
 
-
         if blacklisted_field.match( /\/.*\// )
           regexp         = blacklisted_field.slice(1...-1)
           qualified_name = "#{@database_name}.#{@table_name}.#{field}"
@@ -74,6 +73,10 @@ module AuroraBootstrapper
       index = path.index('/')
       bucket_name = path[0, index]
       object_key = path[index + 1..-1]
+
+      if @s3_client.blank?
+        true
+      end
 
       if object_uploaded?(@s3_client, bucket_name, object_key)
         puts "State '#{object_key}' uploaded to bucket '#{bucket_name}'."

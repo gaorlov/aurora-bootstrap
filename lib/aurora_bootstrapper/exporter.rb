@@ -24,7 +24,7 @@ module AuroraBootstrapper
                              blacklisted_tables: @blacklisted_tables,
                              whitelisted_tables: @whitelisted_tables,
                              blacklisted_fields: @blacklisted_fields,
-                             s3_client: s3_client
+                             s3_client: @s3_client
           database.export! into_bucket: @export_bucket
         rescue => e
           AuroraBootstrapper.logger.error message: "Error in database #{database_name}", error: e
