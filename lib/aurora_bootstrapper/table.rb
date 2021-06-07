@@ -7,8 +7,8 @@ module AuroraBootstrapper
       @database_name      = database_name
       @table_name         = table_name
       @client             = client
-      d = DateTime.now
-      d_str = d.strftime("%Y-%m-%d")
+      d                   = DateTime.now
+      d_str               = d.strftime("%Y-%m-%d")
       @export_date        = ENV.fetch( 'EXPORT_DATE', d_str )
       @s3_client          = s3_client
     end
@@ -76,9 +76,9 @@ module AuroraBootstrapper
 
       if @s3_client
         if object_uploaded?(@s3_client, bucket_name, object_key)
-          puts "State '#{object_key}' uploaded to bucket '#{bucket_name}'."
+          AuroraBootstrapper.logger.info( message: "State file has been uploaded to S3 bucket '#{bucket_name}/#{object_key}'." )
         else
-          puts "State '#{object_key}' not uploaded to bucket '#{bucket_name}'."
+          AuroraBootstrapper.logger.info( message: "State file fails to be uploaded to S3 bucket '#{bucket_name}#{object_key}'." )
         end
       end
 
