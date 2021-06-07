@@ -82,7 +82,7 @@ class TableTest < Minitest::Test
 
       @client.stubs( :query ).returns( "yay" )
       @table.stubs( :object_uploaded? ).returns( true )
-      assert_output( /Export succeeded: / ) do
+      assert_output( /State file fails to be uploaded to S3 bucket / ) do
         assert @table.export!( into_bucket: "s3://bukkit")
       end
     end
