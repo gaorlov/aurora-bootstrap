@@ -58,9 +58,9 @@ module AuroraBootstrapper
     end
 
     def export!( into_bucket: )
-      AuroraBootstrapper.logger.info( message:"Running: #{ export_statement( into_bucket: into_bucket ) }" )
+      AuroraBootstrapper.logger.info( message: "Running: #{ export_statement( into_bucket: into_bucket ) }" )
       @client.query( export_statement( into_bucket: into_bucket ) )
-      AuroraBootstrapper.logger.info( message:"Export succeeded: #{@database_name}.#{@table_name}" )
+      AuroraBootstrapper.logger.info( message: "Export succeeded: #{@database_name}.#{@table_name}" )
 
       # export state to S3
       index = into_bucket.rindex('/')
