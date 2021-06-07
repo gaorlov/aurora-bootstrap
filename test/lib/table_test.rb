@@ -11,7 +11,7 @@ class TableTest < Minitest::Test
                                 password: ENV.fetch( "DB_PASS" ))
 
     @s3_client = Aws::S3::Client.new(stub_responses: true)
-    @s3_client.stub_responses(:put_object, { etag: nil })
+    @s3_client.stub_responses(:put_object, { etag: "test" })
 
     @exporter = AuroraBootstrapper::Exporter.new( client: @client,
                                                   prefix: @prefix,
@@ -125,7 +125,6 @@ class TableTest < Minitest::Test
       AuroraBootstrapper::Table.any_instance.stubs( :export_statement ).returns( "select 'hurrah'" )
 
       assert @exporter.export!
-
     end
   end
 
