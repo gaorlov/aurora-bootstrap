@@ -63,7 +63,7 @@ module AuroraBootstrapper
       @client.query( export_statement( into_bucket: into_bucket ) )
       AuroraBootstrapper.logger.info( message: "Export succeeded: #{@database_name}.#{@table_name}" )
 
-      @notifier.push_state( into_bucket: into_bucket )
+      @notifier.push_state?( into_bucket: into_bucket )
     rescue => e
       AuroraBootstrapper.logger.fatal( mesasge: "Export statement '#{export_statement( into_bucket: into_bucket )}' failed", error: e )
       false

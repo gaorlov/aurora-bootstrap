@@ -6,7 +6,7 @@ module AuroraBootstrapper
       @s3_client = s3_client
     end
 
-    def push_state( into_bucket: )
+    def push_state?( into_bucket: )
 
       # remove the last subfolder which contains db partition name and the prefix s3://
       index = into_bucket.rindex('/')
