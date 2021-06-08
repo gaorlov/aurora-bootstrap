@@ -11,6 +11,7 @@ module AuroraBootstrapper
       d_str               = d.strftime("%Y-%m-%d")
       @export_date        = ENV.fetch( 'EXPORT_DATE', d_str )
       @s3_client          = s3_client
+      @notifier           = Notifier.new s3_client: @s3_client
     end
 
     def fields
@@ -58,31 +59,11 @@ module AuroraBootstrapper
     end
 
     def export!( into_bucket: )
-      AuroraBootstrapper.logger.info( message: "Running: #{ export_statement( into_bucket: into_bucket ) }" )
+      AuroraBootstrapper.logger.info( message: "Running Export: #{ export_statement( into_bucket: into_bucket ) }" )
       @client.query( export_statement( into_bucket: into_bucket ) )
       AuroraBootstrapper.logger.info( message: "Export succeeded: #{@database_name}.#{@table_name}" )
 
-      # export state to S3
-      index = into_bucket.rindex('/')
-      if index > 5
-        into_bucket = into_bucket[5..index-1]
-      else
-        into_bucket = into_bucket[5..-1]
-      end
-      path = [into_bucket, @export_date, 'DONE.txt' ].compact.join('/')
-      index = path.index('/')
-      bucket_name = path[0, index]
-      object_key = path[index + 1..-1]
-
-      if @s3_client
-        if object_uploaded?(@s3_client, bucket_name, object_key)
-          AuroraBootstrapper.logger.info( message: "State file has been uploaded to S3 bucket '#{bucket_name}/#{object_key}'." )
-        else
-          AuroraBootstrapper.logger.info( message: "State file fails in being uploaded to S3 bucket '#{bucket_name}#{object_key}'." )
-        end
-      end
-
-      true
+      @notifier.push_state( into_bucket: into_bucket )
     rescue => e
       AuroraBootstrapper.logger.fatal( mesasge: "Export statement '#{export_statement( into_bucket: into_bucket )}' failed", error: e )
       false
@@ -99,20 +80,5 @@ module AuroraBootstrapper
       SQL
     end
 
-    def object_uploaded?(s3_client, bucket_name, object_key)
-      response = s3_client.put_object(
-        bucket: bucket_name,
-        key: object_key
-      )
-
-      if response.etag
-        true
-      else
-        false
-      end
-    rescue => e
-      AuroraBootstrapper.logger.fatal( mesasge: "State file fails in being uploaded to S3 bucket '#{bucket_name}#{object_key}'.",  error: e )
-      false
-    end
   end
 end
