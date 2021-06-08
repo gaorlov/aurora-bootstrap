@@ -7,9 +7,6 @@ module AuroraBootstrapper
       @database_name      = database_name
       @table_name         = table_name
       @client             = client
-      d                   = DateTime.now
-      d_str               = d.strftime("%Y-%m-%d")
-      @export_date        = ENV.fetch( 'EXPORT_DATE', d_str )
       @notifier           = Notifier.new s3_client: s3_client
     end
 

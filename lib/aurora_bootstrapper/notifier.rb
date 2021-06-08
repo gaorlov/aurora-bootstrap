@@ -4,6 +4,9 @@ module AuroraBootstrapper
   class Notifier
     def initialize( s3_client )
       @s3_client = s3_client
+      d                   = DateTime.now
+      d_str               = d.strftime("%Y-%m-%d")
+      @export_date        = ENV.fetch( 'EXPORT_DATE', d_str )
     end
 
     def push_state?( into_bucket: )
