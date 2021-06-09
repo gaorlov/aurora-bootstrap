@@ -15,7 +15,7 @@ module AuroraBootstrapper
       # append export_date (if there is any) and empty state file DONE.txt
       path = [into_bucket, export_date, 'DONE.txt' ].compact.join('/')
       index = path.index('/')
-      bucket_name = path[0, index]
+      bucket_name = path[0, index - 1]
       object_key = path[index + 1..-1]
 
       if object_uploaded?(bucket_name, object_key)
