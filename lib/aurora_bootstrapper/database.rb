@@ -1,11 +1,12 @@
 module AuroraBootstrapper
   class Database
-    def initialize( database_name:, client:, blacklisted_tables: [], whitelisted_tables: [], blacklisted_fields: [] )
+    def initialize( database_name:, client:, blacklisted_tables: [], whitelisted_tables: [], blacklisted_fields: [], export_date: nil )
       @database_name      = database_name
       @blacklisted_tables = blacklisted_tables
       @whitelisted_tables = whitelisted_tables
       @blacklisted_fields = blacklisted_fields
       @client             = client
+      @export_date        = export_date
     end
 
     def table_names
@@ -24,7 +25,8 @@ module AuroraBootstrapper
         table = Table.new database_name: @database_name,
                              table_name: table_name,
                                  client: @client,
-                     blacklisted_fields: @blacklisted_fields
+                     blacklisted_fields: @blacklisted_fields,
+                     export_date: @export_date
 
         table.export!( into_bucket: into_bucket )
       end

@@ -2,14 +2,12 @@ require 'aws-sdk-s3'
 
 module AuroraBootstrapper
   class Table
-    def initialize( database_name:, table_name:, client:, blacklisted_fields: [])
+    def initialize( database_name:, table_name:, client:, blacklisted_fields: [], export_date: nil)
       @blacklisted_fields = blacklisted_fields
       @database_name      = database_name
       @table_name         = table_name
       @client             = client
-      d                   = DateTime.now
-      d_str               = d.strftime("%Y-%m-%d")
-      @export_date        = ENV.fetch( 'EXPORT_DATE', d_str )
+      @export_date        = export_date
     end
 
     def fields
