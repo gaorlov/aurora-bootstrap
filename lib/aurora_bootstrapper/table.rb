@@ -2,12 +2,11 @@ require 'aws-sdk-s3'
 
 module AuroraBootstrapper
   class Table
-    def initialize( database_name:, table_name:, client:, blacklisted_fields: [], s3_client: nil )
+    def initialize( database_name:, table_name:, client:, blacklisted_fields: [])
       @blacklisted_fields = blacklisted_fields
       @database_name      = database_name
       @table_name         = table_name
       @client             = client
-      @notifier           = Notifier.new s3_client: s3_client
       d                   = DateTime.now
       d_str               = d.strftime("%Y-%m-%d")
       @export_date        = ENV.fetch( 'EXPORT_DATE', d_str )
@@ -61,8 +60,7 @@ module AuroraBootstrapper
       AuroraBootstrapper.logger.info( message: "Running Export: #{ export_statement( into_bucket: into_bucket ) }" )
       @client.query( export_statement( into_bucket: into_bucket ) )
       AuroraBootstrapper.logger.info( message: "Export succeeded: #{@database_name}.#{@table_name}" )
-
-      @notifier.push_state?( into_bucket: into_bucket )
+      true
     rescue => e
       AuroraBootstrapper.logger.fatal( mesasge: "Export statement '#{export_statement( into_bucket: into_bucket )}' failed", error: e )
       false

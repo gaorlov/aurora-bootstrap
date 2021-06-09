@@ -10,22 +10,17 @@ class TableTest < Minitest::Test
                                 username: ENV.fetch( "DB_USER" ),
                                 password: ENV.fetch( "DB_PASS" ))
 
-    @s3_client = Aws::S3::Client.new(stub_responses: true)
-    @s3_client.stub_responses(:put_object, { etag: "test" })
-
     @exporter = AuroraBootstrapper::Exporter.new( client: @client,
                                                   prefix: @prefix,
                                            export_bucket: @bukkit )
 
     @table    = AuroraBootstrapper::Table.new database_name: "master",
                                                  table_name: "users",
-                                                     client: @client,
-                                                     s3_client: @s3_client
+                                                     client: @client
 
     @table2   = AuroraBootstrapper::Table.new database_name: "user_name-test",
                                                  table_name: "images",
-                                                     client: @client,
-                                                     s3_client: @s3_client
+                                                     client: @client
   end
 
   def test_fields
@@ -82,7 +77,7 @@ class TableTest < Minitest::Test
       end
 
       @client.stubs( :query ).returns( "yay" )
-      assert_output( /State file has been uploaded to S3 bucket/ ) do
+      assert_output( /Export succeeded/ ) do
         assert @table.export!( into_bucket: "s3://bukkit" )
       end
     end
