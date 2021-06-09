@@ -8,20 +8,11 @@ module AuroraBootstrapper
     end
 
     def push_state?( export_date:, into_bucket: )
-
-      # remove the last subfolder which contains db partition name and the prefix s3://
-      index = into_bucket.rindex('/')
-      if index > 5
-        into_bucket = into_bucket[5..index-1]
-      else
-        into_bucket = into_bucket[5..-1]
-      end
-
-      # append export_date (if there is any) and empty state file DONE.txt
-      path = [into_bucket, export_date, 'DONE.txt' ].compact.join('/')
-      index = path.index('/')
-      bucket_name = path[0, index]
-      object_key = path[index + 1..-1]
+      bento = into_bucket[/.*(app1[a-zA-Z])/, 0]
+      # hard code the bucket name
+      bucket_name = 'us-west-2.outreach-elt'
+      # store DONE.txt at the top level of the folder for a given bento and a given day
+      object_key = "backfill/#{bento}/#{export_date}/DONE.txt"
 
       if object_uploaded?(bucket_name, object_key)
         AuroraBootstrapper.logger.info( message: "State file has been uploaded to S3 bucket '#{bucket_name}/#{object_key}'." )
