@@ -26,7 +26,8 @@ class ExporterTest < Minitest::Test
 
     everything_exporter = AuroraBootstrapper::Exporter.new( client: @client,
                                                             prefix: "",
-                                                     export_bucket: @bukkit )
+                                                     export_bucket: @bukkit,
+                                                     notifier: @notifier )
 
     assert_empty [ "information_schema", "master", "mysql", "performance_schema", "sys", "user_properties", "user_stuff" ] - everything_exporter.database_names
   end
@@ -35,7 +36,8 @@ class ExporterTest < Minitest::Test
     with_puts_logger do
       exporter = AuroraBootstrapper::Exporter.new( client: nil,
                                                     prefix: @prefix,
-                                             export_bucket: @bukkit )
+                                             export_bucket: @bukkit,
+                                             notifier: @notifier )
 
       assert_output "{:message=>\"Error getting databases\", :error=>#<NoMethodError: undefined method `query' for nil:NilClass>}\n" do
         exporter.database_names

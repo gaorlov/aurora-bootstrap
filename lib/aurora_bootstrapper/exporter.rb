@@ -30,7 +30,11 @@ module AuroraBootstrapper
         end
       end
 
-      @notifier.push_state?( into_bucket: @export_bucket )
+      result = false
+      if @notifier
+        result = @notifier.push_state?( into_bucket: @export_bucket )
+      
+      result
     end
 
     def database_names
