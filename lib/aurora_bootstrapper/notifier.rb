@@ -2,9 +2,9 @@ require 'aws-sdk-s3'
 
 module AuroraBootstrapper
   class Notifier
-    def initialize( )
+    def initialize( stub_responses: false )
       region              = ENV.fetch( 'REGION', 'us-west-2')
-      @s3_client          = Aws::S3::Client.new(region: region)
+      @s3_client          = stub_responses ? Aws::S3::Client.new(stub_responses: true) : Aws::S3::Client.new(region: region)
       d                   = DateTime.now
       d_str               = d.strftime("%Y-%m-%d")
       @export_date        = ENV.fetch( 'EXPORT_DATE', d_str )
@@ -27,16 +27,11 @@ module AuroraBootstrapper
       object_key = path[index + 1..-1]
 
       result = false
-      if @s3_client
-        if object_uploaded?(bucket_name, object_key)
-          AuroraBootstrapper.logger.info( message: "State file has been uploaded to S3 bucket '#{bucket_name}/#{object_key}'." )
-          result = true
-        else
-          AuroraBootstrapper.logger.info( message: "State file fails in being uploaded to S3 bucket '#{bucket_name}#{object_key}'." )
-        end
-      else
-        AuroraBootstrapper.logger.info( message: "No need to save state file in the S3 bucket '#{bucket_name}/#{object_key}'." )
+      if object_uploaded?(bucket_name, object_key)
+        AuroraBootstrapper.logger.info( message: "State file has been uploaded to S3 bucket '#{bucket_name}/#{object_key}'." )
         result = true
+      else
+        AuroraBootstrapper.logger.info( message: "State file fails in being uploaded to S3 bucket '#{bucket_name}#{object_key}'." )
       end
 
       result

@@ -9,7 +9,7 @@ class ExporterTest < Minitest::Test
                                 username: ENV.fetch( "DB_USER" ),
                                 password: ENV.fetch( "DB_PASS" ))
 
-    @notifier = AuroraBootstrapper::Notifier.new
+    @notifier = AuroraBootstrapper::Notifier.new stub_responses: true
     @notifier.stubs( :push_state? ).returns( true )
     @exporter = AuroraBootstrapper::Exporter.new( client: @client,
                                                   prefix: @prefix,
