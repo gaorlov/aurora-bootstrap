@@ -9,9 +9,12 @@ class DatabaseTest < Minitest::Test
                                 username: ENV.fetch( "DB_USER" ),
                                 password: ENV.fetch( "DB_PASS" ))
 
+    @notifier = AuroraBootstrapper::Notifier.new
+    @notifier.stubs( :push_state? ).returns( true )
     @exporter = AuroraBootstrapper::Exporter.new( client: @client,
                                                   prefix: @prefix,
-                                           export_bucket: @bukkit )
+                                           export_bucket: @bukkit,
+                                           notifier: @notifier )
   end
 
   def test_table_names
