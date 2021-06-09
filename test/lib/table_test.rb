@@ -21,6 +21,7 @@ class TableTest < Minitest::Test
                                                  table_name: "users",
                                                      client: @client,
                                                      s3_client: @s3_client
+
     @table2   = AuroraBootstrapper::Table.new database_name: "user_name-test",
                                                  table_name: "images",
                                                      client: @client,
@@ -81,7 +82,7 @@ class TableTest < Minitest::Test
       end
 
       @client.stubs( :query ).returns( "yay" )
-      assert_output( /State file has been uploaded to S3 bucket / ) do
+      assert_output( /State file has been uploaded to S3 bucket/ ) do
         assert @table.export!( into_bucket: "s3://bukkit" )
       end
     end

@@ -26,16 +26,28 @@ module AuroraBootstrapper
       object_key = path[index + 1..-1]
 
       result = false
-      if @s3_client
-        if object_uploaded?(bucket_name, object_key)
-          AuroraBootstrapper.logger.info( message: "State file has been uploaded to S3 bucket '#{bucket_name}/#{object_key}'." )
-          result = true
-        else
-          AuroraBootstrapper.logger.info( message: "State file fails in being uploaded to S3 bucket '#{bucket_name}#{object_key}'." )
-        end
-      else
-        AuroraBootstrapper.logger.info( message: "No need to save state file in the S3 bucket '#{bucket_name}/#{object_key}'." )
+    #   if @s3_client
+    #     if object_uploaded?(bucket_name, object_key)
+    #       AuroraBootstrapper.logger.info( message: "State file has been uploaded to S3 bucket '#{bucket_name}/#{object_key}'." )
+    #       result = true
+    #     else
+    #       AuroraBootstrapper.logger.info( message: "State file fails in being uploaded to S3 bucket '#{bucket_name}#{object_key}'." )
+    #     end
+    #   else
+    #     AuroraBootstrapper.logger.info( message: "No need to save state file in the S3 bucket '#{bucket_name}/#{object_key}'." )
+    #     result = true
+    #   end
+
+      response = @s3_client.put_object(
+        bucket: bucket_name,
+        key: object_key
+      )
+
+      if response.etag
+        AuroraBootstrapper.logger.info( message: "State file has been uploaded to S3 bucket '#{bucket_name}/#{object_key}'." )
         result = true
+      else
+        result = false
       end
 
       result
