@@ -4,14 +4,14 @@ module AuroraBootstrapper
   class Exporter
     attr_reader :client
 
-    def initialize( client:, prefix: "", export_bucket:, blacklisted_tables: "", whitelisted_tables: "", blacklisted_fields: "" )
+    def initialize( client:, prefix: "", export_bucket:, blacklisted_tables: "", whitelisted_tables: "", blacklisted_fields: "", notifier: nil )
       @match              = "#{prefix}.*"
       @export_bucket      = export_bucket
       @blacklisted_tables = blacklisted_tables.split(",")
       @whitelisted_tables = whitelisted_tables.split(",")
       @blacklisted_fields = blacklisted_fields.split(",")
       @client             = client
-      @notifier           = Notifier.New
+      @notifier           = notifier
     end
 
     def export!

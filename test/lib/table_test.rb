@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'aws-sdk-s3'
 
 class TableTest < Minitest::Test
   def setup
