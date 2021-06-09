@@ -82,14 +82,14 @@ class TableTest < Minitest::Test
 
       @client.stubs( :query ).returns( "yay" )
       assert_output( /State file has been uploaded to S3 bucket / ) do
-        assert @table.export!( into_bucket: "s3://bukkit")
+        assert @table.export!( into_bucket: "s3://bukkit" )
       end
     end
   end
 
   def test_blacklisted_fields
     table = table_with_blacklist( ["first_name", "users.last_name", "master.users.email"] )
-    
+
     assert table.blacklisted_field?( "first_name" )
     assert table.blacklisted_field?( "last_name" )
     assert table.blacklisted_field?( "email" )
@@ -97,7 +97,7 @@ class TableTest < Minitest::Test
 
   def test_blacklisted_fields_with_regexps 
     table = table_with_blacklist( ["/first.*/", "/users.last.*/", "/.*.users.email/"] )
-    
+
     assert table.blacklisted_field?( "email" )
     assert table.blacklisted_field?( "first_name" )
     assert table.blacklisted_field?( "last_name" )    
