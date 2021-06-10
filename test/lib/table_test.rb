@@ -18,11 +18,13 @@ class TableTest < Minitest::Test
 
     @table    = AuroraBootstrapper::Table.new database_name: "master",
                                                  table_name: "users",
-                                                     client: @client
+                                                     client: @client,
+                                                     export_date: '10-12-2020'
 
     @table2   = AuroraBootstrapper::Table.new database_name: "user_name-test",
                                                  table_name: "images",
-                                                     client: @client
+                                                     client: @client,
+                                                     export_date: '10-12-2020'
   end
 
   def test_fields

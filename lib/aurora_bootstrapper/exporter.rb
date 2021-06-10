@@ -35,7 +35,7 @@ module AuroraBootstrapper
         end
       end
 
-      result = false
+      result = true
       if @notifier
         result = @notifier.push_state?( export_date: @export_date, into_bucket: @export_bucket )
       end
