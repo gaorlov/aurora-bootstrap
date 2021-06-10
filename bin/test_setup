@@ -5,4 +5,3 @@ docker exec -i $CONTAINER_ID mysql -uroot -proot  <<< `cat ./test/sql/user.sql`
 docker exec -i $CONTAINER_ID mysql -uroot -proot  <<< `cat ./test/sql/drop.sql`
 docker exec -i $CONTAINER_ID mysql -uroot -proot  <<< `cat ./test/sql/fixtures.sql`
 docker exec -i $CONTAINER_ID mysql -uroot -proot  <<< `cat ./test/sql/perms.sql`
-docker exec -i $CONTAINER_ID mysql -uroot -proot  <<< `cat ./test/sql/user_copy.sql`
