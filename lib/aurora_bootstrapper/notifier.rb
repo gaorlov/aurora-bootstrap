@@ -1,46 +1,53 @@
-require 'aws-sdk-s3'
-
 module AuroraBootstrapper
   class Notifier
-    def initialize( stub_responses: false )
-      region              = ENV.fetch( 'REGION', 'us-west-2')
-      @s3_client          = stub_responses ? Aws::S3::Client.new(stub_responses: true) : Aws::S3::Client.new(region: region)
+    def initialize( s3_path: s3_path)
+        @s3_path = s3_path
+        @export_date ||= ENV.fetch( 'EXPORT_DATE', DateTime.now.strftime("%Y-%m-%d") )
     end
-
-    def push_state?( export_date:, into_bucket: )
-
-      # remove the prefix s3://
-      into_bucket = into_bucket[5..-1]
-
-      # append export_date (if there is any) and empty state file DONE.txt
-      path = [into_bucket, export_date, 'DONE.txt' ].compact.join('/')
-      index = path.index('/')
-      bucket_name = path[0, index - 1]
-      object_key = path[index + 1..-1]
-
-      if object_uploaded?(bucket_name, object_key)
-        AuroraBootstrapper.logger.info( message: "State file has been uploaded to S3 bucket '#{bucket_name}/#{object_key}'." )
-        true
-      else
-        AuroraBootstrapper.logger.info( message: "State file fails in being uploaded to S3 bucket '#{bucket_name}/#{object_key}'." )
-        false
-      end
-    end
-
-    def object_uploaded?( bucket_name, object_key )
-      response = @s3_client.put_object(
+      
+    def notify
+      client.put_object(
         bucket: bucket_name,
         key: object_key
       )
-
-      if response.etag
-        true
-      else
-        false
-      end
+      AuroraBootstrapper.logger.info( message: "State file has been uploaded to S3 '#{bucket_name}/#{object_key}'." )
     rescue => e
-      AuroraBootstrapper.logger.fatal( mesasge: "State file fails in being uploaded to S3 bucket '#{bucket_name}/#{object_key}'.",  error: e )
-      false
+      AuroraBootstrapper.logger.error( message: "State file failed to upload to S3 '#{bucket_name}/#{object_key}': #{e.messages}." )
     end
+
+    def export_date
+      @export_date
+    end
+    
+    protected
+    
+    def region
+      @region ||= ENV.fetch( 'REGION', 'us-west-2' )
+    end
+    
+    def client
+      @client ||= Aws::S3::Client.new(region: region)
+    end
+      
+    def bucket
+      @bucket  ||= unprefixed_path.split( '/' ).first
+    end
+      
+    def object_key
+      @object_key ||= [ bucket_path, export_date, filename ].join( '/' )
+    end
+    
+    def bucket_path
+      @bucket_path ||= ( unprefixed_path.split( '/' ) - [ bucket ] ).join( '/' )
+    end
+    
+    def filename
+      'DONE.txt'
+    end
+    
+    def unprefixed_path
+      @unprefixed_path ||= @s3_path.gsub(/s3:\/\//, "" )
+    end
+
   end
 end
