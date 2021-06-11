@@ -12,7 +12,6 @@ class DatabaseTest < Minitest::Test
     @exporter = AuroraBootstrapper::Exporter.new( client: @client,
                                                   prefix: @prefix,
                                            export_bucket: @bukkit)
-    @exporter.stubs(:notify!).returns(true)
   end
 
   def test_table_names
@@ -78,6 +77,11 @@ class DatabaseTest < Minitest::Test
 
     AuroraBootstrapper::Table.any_instance.stubs( :export! ).returns( true )
     
+    mock = Minitest::Mock.new
+    mock.expect :notify, true
+
+    AuroraBootstrapper::Notifier.any_instance.stubs( :notify ).returns( true )
+
     assert @exporter.export!
   end
 end

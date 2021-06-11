@@ -12,7 +12,6 @@ class ExporterTest < Minitest::Test
     @exporter = AuroraBootstrapper::Exporter.new( client: @client,
                                                   prefix: @prefix,
                                            export_bucket: @bukkit)
-    @exporter.stubs(:notify!).returns(true)
   end
 
   def test_database_names
@@ -45,6 +44,11 @@ class ExporterTest < Minitest::Test
     with_puts_logger do
       AuroraBootstrapper::Database.any_instance.stubs( :table_names ).returns( 5 )
 
+      mock = Minitest::Mock.new
+      mock.expect :notify, true
+
+      AuroraBootstrapper::Notifier.any_instance.stubs( :notify ).returns( true )
+
       assert_output "{:message=>\"Error in database user_name-test\", :error=>#<NoMethodError: undefined method `all?' for 5:Integer>}\n" do
         @exporter.export!
       end
@@ -57,6 +61,11 @@ class ExporterTest < Minitest::Test
 
     AuroraBootstrapper::Database.any_instance.stubs( :export! ).returns( true )
     
+    mock = Minitest::Mock.new
+    mock.expect :notify, true
+
+    AuroraBootstrapper::Notifier.any_instance.stubs( :notify ).returns( true )
+
     assert @exporter.export!
   end
 end

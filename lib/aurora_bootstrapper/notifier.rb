@@ -2,7 +2,9 @@ module AuroraBootstrapper
   class Notifier
     def initialize( s3_path: s3_path)
         @s3_path = s3_path
-        @export_date ||= ENV.fetch( 'EXPORT_DATE', DateTime.now.strftime("%Y-%m-%d") )
+        unless ENV.fetch( 'EXPORT_DATE_TURN_OFF', false )
+          @export_date ||= ENV.fetch( 'EXPORT_DATE', DateTime.now.strftime("%Y-%m-%d") )
+        end
     end
       
     def notify

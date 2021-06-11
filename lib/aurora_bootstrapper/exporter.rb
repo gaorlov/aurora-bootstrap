@@ -32,10 +32,6 @@ module AuroraBootstrapper
         end
       end
 
-      notify!
-    end
-
-    def notify!
       @notifier.notify
     end
 
