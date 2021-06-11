@@ -4,6 +4,8 @@ module AuroraBootstrapper
         @s3_path = s3_path
         if ENV.fetch( 'EXPORT_DATE_OVERRIDE', false )
           @export_date ||= ENV.fetch( 'EXPORT_DATE', DateTime.now.strftime("%Y-%m-%d") )
+        else
+          @export_date ||= ENV.fetch('EXPORT_DATE', nil)
         end
     end
       
