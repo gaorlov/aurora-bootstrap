@@ -1,9 +1,8 @@
 require 'test_helper'
 
-class TableTest < Minitest::Test
+class NotifierTest < Minitest::Test
   def setup
     @bukkit               = ENV.fetch "EXPORT_BUCKET"
-    @notifier             = AuroraBootstrapper::Notifier.new(s3_path: @bukkit)
   end
 
   def test_export_date
@@ -17,11 +16,11 @@ class TableTest < Minitest::Test
   end
 
   def test_unprefixed_path
-    assert_equal "bukkit", AuroraBootstrapper::Notifier.new(s3_path: @bukkit).send(:unprefixed_path)
+    assert_equal "bukkit/blah1/blah2", AuroraBootstrapper::Notifier.new(s3_path: "s3://bukkit/blah1/blah2").send(:unprefixed_path)
   end
 
   def test_bucket
-    assert_equal "bukkit", AuroraBootstrapper::Notifier.new(s3_path: @bukkit).send(:bucket)
+    assert_equal "bukkit", AuroraBootstrapper::Notifier.new(s3_path: "s3://bukkit/blah1/blah2").send(:bucket)
   end
 
   def test_filename
@@ -29,12 +28,12 @@ class TableTest < Minitest::Test
   end
 
   def test_bucket_path
-    assert_equal "", AuroraBootstrapper::Notifier.new(s3_path: @bukkit).send(:bucket_path)
+    assert_equal "blah1/blah2", AuroraBootstrapper::Notifier.new(s3_path: "s3://bukkit/blah1/blah2").send(:bucket_path)
   end
 
   def test_object_key
     export_date = ENV.fetch "EXPORT_DATE"
-    assert_equal "/#{export_date}/DONE.txt", AuroraBootstrapper::Notifier.new(s3_path: @bukkit).send(:object_key)
+    assert_equal "blah1/blah2/#{export_date}/DONE.txt", AuroraBootstrapper::Notifier.new(s3_path: "s3://bukkit/blah1/blah2").send(:object_key)
   end
 
   def test_notify_happy_path
