@@ -2,19 +2,19 @@ module AuroraBootstrapper
   class Notifier
     def initialize( s3_path: s3_path)
         @s3_path = s3_path
-        unless ENV.fetch( 'EXPORT_DATE_TURN_OFF', false )
+        if ENV.fetch( 'EXPORT_DATE_OVERRIDE', false )
           @export_date ||= ENV.fetch( 'EXPORT_DATE', DateTime.now.strftime("%Y-%m-%d") )
         end
     end
       
     def notify
       client.put_object(
-        bucket: bucket_name,
+        bucket: bucket,
         key: object_key
       )
-      AuroraBootstrapper.logger.info( message: "State file has been uploaded to S3 '#{bucket_name}/#{object_key}'." )
+      AuroraBootstrapper.logger.info( message: "State file has been uploaded to S3 '#{bucket}/#{object_key}'." )
     rescue => e
-      AuroraBootstrapper.logger.error( message: "State file failed to upload to S3 '#{bucket_name}/#{object_key}': #{e.messages}." )
+      AuroraBootstrapper.logger.error( message: "State file failed to upload to S3 '#{bucket}/#{object_key}': #{e.message}." )
     end
 
     def export_date
