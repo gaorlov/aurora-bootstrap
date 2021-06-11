@@ -121,11 +121,8 @@ class TableTest < Minitest::Test
 
       AuroraBootstrapper::Table.any_instance.stubs( :export_statement ).returns( "select 'hurrah'" )
 
-      mock = Minitest::Mock.new
-      mock.expect :notify, true
-
       AuroraBootstrapper::Notifier.any_instance.stubs( :notify ).returns( true )
-      
+
       assert @exporter.export!
     end
   end
