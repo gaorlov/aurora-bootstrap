@@ -2,13 +2,17 @@ module AuroraBootstrapper
   class Notifier
     def initialize( s3_path: s3_path)
         @s3_path = s3_path
-        if ENV.fetch( 'EXPORT_DATE_OVERRIDE', false )
-          @export_date ||= ENV.fetch( 'EXPORT_DATE', DateTime.now.strftime("%Y-%m-%d") )
-        else
-          @export_date ||= ENV.fetch('EXPORT_DATE', nil)
-        end
+        export_date
     end
       
+    def export_date
+      @export_date ||= ENV.fetch('EXPORT_DATE', export_date_override )
+    end
+    
+    def export_date_override
+      DateTime.now.strftime("%Y-%m-%d") if ENV.fetch('EXPORT_DATE_OVERRIDE', false)
+    end
+
     def notify
       client.put_object(
         bucket: bucket,
@@ -17,10 +21,6 @@ module AuroraBootstrapper
       AuroraBootstrapper.logger.info( message: "State file has been uploaded to S3 '#{bucket}/#{object_key}'." )
     rescue => e
       AuroraBootstrapper.logger.error( message: "State file failed to upload to S3 '#{bucket}/#{object_key}': #{e.message}." )
-    end
-
-    def export_date
-      @export_date
     end
     
     protected
