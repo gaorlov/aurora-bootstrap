@@ -2,7 +2,6 @@ module AuroraBootstrapper
   class Notifier
     def initialize( s3_path: s3_path)
         @s3_path = s3_path
-        export_date
     end
       
     def export_date

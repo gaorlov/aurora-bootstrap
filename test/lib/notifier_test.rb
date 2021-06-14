@@ -10,6 +10,10 @@ class NotifierTest < Minitest::Test
     assert_equal export_date, AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date
   end
 
+  def test_export_date_override
+    assert_equal DateTime.now.strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date_override
+  end
+
   def test_region
     region = ENV.fetch "REGION"
     assert_equal region, AuroraBootstrapper::Notifier.new(s3_path: @bukkit).send(:region)
