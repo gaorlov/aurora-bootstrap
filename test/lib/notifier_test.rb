@@ -14,6 +14,22 @@ class NotifierTest < Minitest::Test
     assert_equal DateTime.now.strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date_override
   end
 
+  def test_no_export_date_with_export_date_override
+    export_date = ENV.fetch "EXPORT_DATE"
+    ENV.delete("EXPORT_DATE")
+    assert_equal DateTime.now.strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date
+    ENV["EXPORT_DATE"] = export_date
+  end
+
+  def test_no_export_date_with_no_export_date_override
+    export_date = ENV.fetch "EXPORT_DATE"
+    ENV.delete("EXPORT_DATE")
+    ENV.delete("EXPORT_DATE_OVERRIDE")
+    assert_nil AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date
+    ENV["EXPORT_DATE"] = export_date
+    ENV["EXPORT_DATE_OVERRIDE"] = "true"
+  end
+
   def test_region
     region = ENV.fetch "REGION"
     assert_equal region, AuroraBootstrapper::Notifier.new(s3_path: @bukkit).send(:region)
