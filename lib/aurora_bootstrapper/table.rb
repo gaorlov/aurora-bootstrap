@@ -1,5 +1,3 @@
-require 'aws-sdk-s3'
-
 module AuroraBootstrapper
   class Table
     def initialize( database_name:, table_name:, client:, blacklisted_fields: [], export_date: nil)
