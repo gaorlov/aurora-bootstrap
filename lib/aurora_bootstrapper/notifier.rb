@@ -12,11 +12,7 @@ module AuroraBootstrapper
     
     # ENV is string to string dictionary
     def export_date_override
-      DateTime.now.strftime("%Y-%m-%d") if to_boolean(ENV.fetch('EXPORT_DATE_OVERRIDE', 'false'))
-    end
-
-    def to_boolean(str)
-      str == 'true'
+      DateTime.now.strftime("%Y-%m-%d") if ENV.key?('EXPORT_DATE_OVERRIDE')
     end
 
     def notify
