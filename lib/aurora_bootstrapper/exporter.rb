@@ -11,7 +11,7 @@ module AuroraBootstrapper
       @whitelisted_tables = whitelisted_tables.split(",")
       @blacklisted_fields = blacklisted_fields.split(",")
       @client             = client
-      @notifier           = Notifier.new
+      @notifier           = Notifier.new( s3_path: export_bucket )
     end
 
     def export!
