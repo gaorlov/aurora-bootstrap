@@ -10,6 +10,12 @@ class NotifierTest < Minitest::Test
     assert_equal export_date, AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date
   end
 
+  def test_notifier_with_no_s3_path
+    assert_raises ArgumentError do
+      AuroraBootstrapper::Notifier.new
+    end
+  end
+
   def test_export_date_override
     assert_equal DateTime.now.strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date_override
   end
