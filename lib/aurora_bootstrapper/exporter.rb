@@ -14,7 +14,7 @@ module AuroraBootstrapper
       @notifier           = Notifier.new( s3_path: export_bucket )
     rescue => e
       AuroraBootstrapper.logger.error message: "Error in initializing exporter.", error: e
-      raise
+      raise e
     end
 
     def export!
