@@ -5,18 +5,16 @@ module AuroraBootstrapper
     attr_reader :client
 
     def initialize( client:, prefix: "", export_bucket:, blacklisted_tables: "", whitelisted_tables: "", blacklisted_fields: "" )
-      begin
-        @match              = "#{prefix}.*"
-        @export_bucket      = export_bucket
-        @blacklisted_tables = blacklisted_tables.split(",")
-        @whitelisted_tables = whitelisted_tables.split(",")
-        @blacklisted_fields = blacklisted_fields.split(",")
-        @client             = client
-        @notifier           = Notifier.new( s3_path: export_bucket )
-      rescue => e
-        AuroraBootstrapper.logger.error message: "Error in initializing exporter.", error: e
-        raise
-      end
+      @match              = "#{prefix}.*"
+      @export_bucket      = export_bucket
+      @blacklisted_tables = blacklisted_tables.split(",")
+      @whitelisted_tables = whitelisted_tables.split(",")
+      @blacklisted_fields = blacklisted_fields.split(",")
+      @client             = client
+      @notifier           = Notifier.new( s3_path: export_bucket )
+    rescue => e
+      AuroraBootstrapper.logger.error message: "Error in initializing exporter.", error: e
+      raise
     end
 
     def export!
