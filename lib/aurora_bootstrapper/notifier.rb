@@ -12,7 +12,50 @@ module AuroraBootstrapper
     
     # ENV is string to string dictionary
     def export_date_override
-      DateTime.now.strftime("%Y-%m-%d") if ENV.key?('EXPORT_DATE_OVERRIDE')
+      # DateTime.now.strftime("%Y-%m-%d") if ENV.key?('EXPORT_DATE_OVERRIDE')
+
+      datetime = nil
+
+      if ENV.key?('EXPORT_DATE_OVERRIDE')
+        now = Date.today
+        # expiration time is 30 days
+        for i in 0..29
+          done = false
+
+          prefix = [ bucket_path, (now-i).strftime("%Y-%m-%d") ].join( '/' )
+
+          resp = s3.list_objects_v2({
+            bucket: bucket,
+            prefix: prefix
+          })
+
+          objects = resp.contents
+
+          if objects.count.zero?
+            AuroraBootstrapper.logger.info( message: "No objects in bucket '#{bucket}/#{prefix}'." )
+            datetime = (now-i).strftime("%Y-%m-%d")
+          else
+            objects.each do |object|
+              if object.key.include? "DONE"
+                AuroraBootstrapper.logger.info( message: "Found DONE state file in bucket '#{bucket}/#{prefix}'." ) 
+                done = true
+                break           
+              end
+            end
+
+            unless done
+              datetime = (now-i).strftime("%Y-%m-%d")
+            end
+          end
+
+          if !datetime.nil?
+            break
+          end  
+
+        end
+      end
+
+      datetime
     end
 
     def notify
