@@ -12,12 +12,11 @@ module AuroraBootstrapper
     
     # ENV is string to string dictionary
     def export_date_override
-      # DateTime.now.strftime("%Y-%m-%d") if ENV.key?('EXPORT_DATE_OVERRIDE')
-
       datetime = nil
 
       if ENV.key?('EXPORT_DATE_OVERRIDE')
         now = Date.today
+        
         # expiration time is 30 days
         for i in 1..30
           done = false

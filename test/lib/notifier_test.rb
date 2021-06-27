@@ -99,9 +99,15 @@ class NotifierTest < Minitest::Test
   end
 
   def test_notify_happy_path
+    stubbed_objs = {
+      contents: [
+        { key: 'DONE.txt' },
+      ]
+    }
     stub_client = Aws::S3::Client.new(stub_responses: {
-        put_object: { etag: 'etag_id' },
-      })
+      put_object: { etag: 'etag_id' },
+      list_objects_v2: stubbed_objs,
+    })
 
     AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( stub_client )
 
@@ -113,9 +119,15 @@ class NotifierTest < Minitest::Test
   end
 
   def test_notify_sad_path
-    stub_client = Aws::S3::Client.new(stub_responses: true)
-
-    stub_client.stub_responses(:put_object, RuntimeError.new('custom message'))
+    stubbed_objs = {
+      contents: [
+        { key: 'DONE.txt' },
+      ]
+    }
+    stub_client = Aws::S3::Client.new(stub_responses: {
+      put_object: RuntimeError.new('custom message'),
+      list_objects_v2: stubbed_objs,
+    })
 
     AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( stub_client )
 
