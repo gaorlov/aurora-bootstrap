@@ -123,6 +123,8 @@ class TableTest < Minitest::Test
 
       AuroraBootstrapper::Notifier.any_instance.stubs( :notify ).returns( true )
 
+      AuroraBootstrapper::Notifier.any_instance.stubs( :export_date ).returns( '2021-06-01' )
+      
       assert @exporter.export!
     end
   end

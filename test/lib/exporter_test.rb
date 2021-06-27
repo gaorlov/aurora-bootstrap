@@ -49,7 +49,7 @@ class ExporterTest < Minitest::Test
     }
     stub_client.stub_responses(:list_objects_v2, stubbed_objs)
     AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( stub_client )
-    
+
     with_puts_logger do
       AuroraBootstrapper::Database.any_instance.stubs( :table_names ).returns( 5 )
 
@@ -65,6 +65,8 @@ class ExporterTest < Minitest::Test
     AuroraBootstrapper::Database.any_instance.stubs( :export! ).returns( true )
     
     AuroraBootstrapper::Notifier.any_instance.stubs( :notify ).returns( true )
+
+    AuroraBootstrapper::Notifier.any_instance.stubs( :export_date ).returns( '2021-06-01' )
 
     assert @exporter.export!
   end
