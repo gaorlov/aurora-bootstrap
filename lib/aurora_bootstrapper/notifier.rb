@@ -24,7 +24,7 @@ module AuroraBootstrapper
 
           prefix = [ bucket_path, (now-i).strftime("%Y-%m-%d") ].join( '/' )
 
-          resp = s3.list_objects_v2({
+          resp = client.list_objects_v2({
             bucket: bucket,
             prefix: prefix
           })
@@ -33,25 +33,25 @@ module AuroraBootstrapper
 
           if objects.count.zero?
             AuroraBootstrapper.logger.info( message: "No objects in bucket '#{bucket}/#{prefix}'." )
-            datetime = (now-i).strftime("%Y-%m-%d")
           else
             objects.each do |object|
               if object.key.include? "DONE"
-                AuroraBootstrapper.logger.info( message: "Found DONE state file in bucket '#{bucket}/#{prefix}'." ) 
+                AuroraBootstrapper.logger.info( message: "Found the latest DONE state file in bucket '#{bucket}/#{prefix}'." ) 
                 done = true
                 break           
               end
             end
 
-            unless done
-              datetime = (now-i).strftime("%Y-%m-%d")
+            if done
+              datetime = (now-i+1).strftime("%Y-%m-%d")
+              break
             end
           end
+        end
 
-          if !datetime.nil?
-            break
-          end  
-
+        # the first run for the given db partition
+        if datetime.nil?
+          datetime = now.strftime("%Y-%m-%d")
         end
       end
 
