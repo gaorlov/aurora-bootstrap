@@ -19,7 +19,7 @@ module AuroraBootstrapper
       if ENV.key?('EXPORT_DATE_OVERRIDE')
         now = Date.today
         # expiration time is 30 days
-        for i in 0..29
+        for i in 1..30
           done = false
 
           prefix = [ bucket_path, (now-i).strftime("%Y-%m-%d") ].join( '/' )
@@ -36,7 +36,6 @@ module AuroraBootstrapper
           else
             objects.each do |object|
               if object.key.include? "DONE"
-                AuroraBootstrapper.logger.info( message: "Found the latest DONE state file in bucket '#{bucket}/#{prefix}'." ) 
                 done = true
                 break           
               end

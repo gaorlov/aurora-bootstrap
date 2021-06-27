@@ -6,6 +6,15 @@ class NotifierTest < Minitest::Test
   end
 
   def test_export_date
+    stub_client = Aws::S3::Client.new(stub_responses: true)
+    stubbed_objs = {
+      contents: [
+        { key: 'DONE.txt' },
+      ]
+    }
+    stub_client.stub_responses(:list_objects_v2, stubbed_objs)
+    AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( stub_client )
+
     export_date = ENV.fetch "EXPORT_DATE"
     assert_equal export_date, AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date
   end
@@ -17,12 +26,30 @@ class NotifierTest < Minitest::Test
   end
 
   def test_export_date_override
+    stub_client = Aws::S3::Client.new(stub_responses: true)
+    stubbed_objs = {
+      contents: [
+        { key: 'DONE.txt' },
+      ]
+    }
+    stub_client.stub_responses(:list_objects_v2, stubbed_objs)
+    AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( stub_client )
     assert_equal DateTime.now.strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date_override
   end
 
   def test_no_export_date_with_export_date_override
     export_date = ENV.fetch "EXPORT_DATE"
     ENV.delete("EXPORT_DATE")
+
+    stub_client = Aws::S3::Client.new(stub_responses: true)
+    stubbed_objs = {
+      contents: [
+        { key: 'DONE.txt' },
+      ]
+    }
+    stub_client.stub_responses(:list_objects_v2, stubbed_objs)
+    AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( stub_client )
+
     assert_equal DateTime.now.strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date
     ENV["EXPORT_DATE"] = export_date
   end
@@ -58,6 +85,15 @@ class NotifierTest < Minitest::Test
   end
 
   def test_object_key
+    stub_client = Aws::S3::Client.new(stub_responses: true)
+    stubbed_objs = {
+      contents: [
+        { key: 'DONE.txt' },
+      ]
+    }
+    stub_client.stub_responses(:list_objects_v2, stubbed_objs)
+    AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( stub_client )
+
     export_date = ENV.fetch "EXPORT_DATE"
     assert_equal "blah1/blah2/#{export_date}/DONE.txt", AuroraBootstrapper::Notifier.new(s3_path: "s3://bukkit/blah1/blah2").send(:object_key)
   end

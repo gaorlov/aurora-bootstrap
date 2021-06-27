@@ -41,6 +41,15 @@ class ExporterTest < Minitest::Test
   end
 
   def test_export_logs_on_error
+    stub_client = Aws::S3::Client.new(stub_responses: true)
+    stubbed_objs = {
+      contents: [
+        { key: 'DONE.txt' },
+      ]
+    }
+    stub_client.stub_responses(:list_objects_v2, stubbed_objs)
+    AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( stub_client )
+    
     with_puts_logger do
       AuroraBootstrapper::Database.any_instance.stubs( :table_names ).returns( 5 )
 
