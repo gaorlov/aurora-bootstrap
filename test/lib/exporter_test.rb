@@ -41,19 +41,13 @@ class ExporterTest < Minitest::Test
   end
 
   def test_export_logs_on_error
-    stub_client = Aws::S3::Client.new(stub_responses: true)
-    stubbed_objs = {
-      contents: [
-        { key: 'DONE.txt' },
-      ]
-    }
-    stub_client.stub_responses(:list_objects_v2, stubbed_objs)
-    AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( stub_client )
-
+    
     with_puts_logger do
       AuroraBootstrapper::Database.any_instance.stubs( :table_names ).returns( 5 )
 
       AuroraBootstrapper::Notifier.any_instance.stubs( :notify ).returns( true )
+
+      AuroraBootstrapper::Notifier.any_instance.stubs( :export_date ).returns( '2021-06-01' )
 
       assert_output "{:message=>\"Error in database user_name-test\", :error=>#<NoMethodError: undefined method `all?' for 5:Integer>}\n" do
         @exporter.export!
