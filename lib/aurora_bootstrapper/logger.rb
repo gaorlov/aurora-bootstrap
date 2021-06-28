@@ -5,7 +5,12 @@ require "multi_json"
 module AuroraBootstrapper
   class Logger
     Rollbar.configure do |config|
-      config.access_token = ENV.fetch( 'ROLLBAR_TOKEN' )
+      if ENV.key?('ROLLBAR_TOKEN')
+        rollbar_token = ENV.fetch( 'ROLLBAR_TOKEN')
+      else  
+        rollbar_token = File.open(ENV.fetch( 'AURORA_BOOTSTRAP_ROLLBAR_TOKEN_FILE' ), &:readline)
+      end
+      config.access_token = rollbar_token
     end
 
     ROLLBAR_SEVERITY = { error: :error,
