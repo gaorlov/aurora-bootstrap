@@ -10,6 +10,19 @@ SimpleCov.start do
   add_filter "/test/"
 end
 
+class DummyFile
+  def write( *args )
+    puts( *args )
+  end
+
+  def read
+    'test'
+  end
+
+  def close; end
+
+end
+
 class PutsLogger
   [:fatal, :error, :warn, :info, :debug].each do |severity|
     define_method severity do | args, &block |

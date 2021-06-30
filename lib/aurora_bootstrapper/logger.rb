@@ -8,7 +8,8 @@ module AuroraBootstrapper
       if ENV.key?('ROLLBAR_TOKEN')
         rollbar_token = ENV.fetch( 'ROLLBAR_TOKEN')
       else  
-        rollbar_token = File.open(ENV.fetch( 'AURORA_BOOTSTRAP_ROLLBAR_TOKEN_FILE' ), &:readline)
+        file_object = File.open(ENV.fetch( 'AURORA_BOOTSTRAP_ROLLBAR_TOKEN_FILE' ))
+        rollbar_token = file_object.read
       end
       config.access_token = rollbar_token
     end

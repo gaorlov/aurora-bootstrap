@@ -12,48 +12,59 @@ module AuroraBootstrapper
     
     # ENV is string to string dictionary
     def export_date_override
-      datetime = nil
+      done_datetime_str = nil
 
       if ENV.key?('EXPORT_DATE_OVERRIDE')
         now = Date.today
         
         # expiration time is 30 days
         for i in 1..30
-          done = false
-
-          prefix = [ bucket_path, (now-i).strftime("%Y-%m-%d") ].join( '/' )
-
-          resp = client.list_objects_v2({
-            bucket: bucket,
-            prefix: prefix
-          })
-
-          objects = resp.contents
-
-          if objects.count.zero?
-            AuroraBootstrapper.logger.info( message: "No objects in bucket '#{bucket}/#{prefix}'." )
-          else
-            objects.each do |object|
-              if object.key.include? "DONE"
-                done = true
-                break           
-              end
-            end
-
-            if done
-              datetime = (now-i+1).strftime("%Y-%m-%d")
-              break
-            end
+          done_datetime_str = check_db_dump_done_for_one_day( datetime: (now-i))
+          unless done_datetime_str.nil?
+            break
           end
         end
 
         # the first run for the given db partition
-        if datetime.nil?
-          datetime = now.strftime("%Y-%m-%d")
+        if done_datetime_str.nil?
+          done_datetime_str = now.strftime("%Y-%m-%d")
         end
       end
 
-      datetime
+      done_datetime_str
+    end
+
+    def check_db_dump_done_for_one_day( datetime: )
+      done_datetime_str = nil
+      prefix = [ bucket_path, datetime.strftime("%Y-%m-%d") ].join( '/' )
+
+      resp = client.list_objects_v2({
+        bucket: bucket,
+        prefix: prefix
+      })
+
+      if parse_resp(resp: resp)
+        done_datetime_str = datetime.strftime("%Y-%m-%d")
+      end
+      
+      done_datetime_str
+    end
+
+    def parse_resp( resp: )
+      objects = resp.contents
+      exists_done_file = false
+      if objects.count.zero?
+        AuroraBootstrapper.logger.info( message: "No objects in bucket '#{bucket}/#{prefix}'." )
+      else
+        objects.each do |object|
+          if object.key.include? "DONE"
+            exists_done_file = true
+            break
+          end
+        end
+      end
+
+      exists_done_file
     end
 
     def notify
