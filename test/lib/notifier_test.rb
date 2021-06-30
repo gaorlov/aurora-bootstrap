@@ -28,9 +28,58 @@ class NotifierTest < Minitest::Test
     end
   end
 
-  def test_export_date_override
+  def test_parse_resp_with_done_file
+    resp = Aws::S3::Types::ListObjectsV2Output.new
+    obj = Aws::S3::Types::Object.new
+    obj.key = 'DONE.txt'
+    resp.contents = [obj]
+    assert AuroraBootstrapper::Notifier.new(s3_path: @bukkit).parse_resp(resp: resp)
+  end
+
+  def test_parse_resp_without_done_file
+    resp = Aws::S3::Types::ListObjectsV2Output.new
+    obj = Aws::S3::Types::Object.new
+    obj.key = 'other.txt'
+    resp.contents = [obj]
+    assert !AuroraBootstrapper::Notifier.new(s3_path: @bukkit).parse_resp(resp: resp)
+  end
+
+  def test_check_db_dump_done_for_one_day_with_done_file
+    AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( @stub_client )
+    assert_equal (DateTime.now-1).strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).check_db_dump_done_for_one_day(datetime: DateTime.now-1)
+  end
+
+  def test_check_db_dump_done_for_one_day_without_done_file
+    stubbed_objs = {
+      contents: [
+        { key: 'other.txt' },
+      ]
+    }
+    local_stub_client = Aws::S3::Client.new(stub_responses: {
+      list_objects_v2: stubbed_objs,
+    })
+
+    AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( local_stub_client )
+    assert_nil AuroraBootstrapper::Notifier.new(s3_path: @bukkit).check_db_dump_done_for_one_day(datetime: DateTime.now-1)
+  end
+
+  def test_export_date_override_with_done_file
     AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( @stub_client )
     assert_equal (DateTime.now-1).strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date_override
+  end
+
+  def test_export_date_override_without_done_file
+    stubbed_objs = {
+      contents: [
+        { key: 'other.txt' },
+      ]
+    }
+    local_stub_client = Aws::S3::Client.new(stub_responses: {
+      list_objects_v2: stubbed_objs,
+    })
+
+    AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( local_stub_client )
+    assert_equal DateTime.now.strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date_override
   end
 
   def test_no_export_date_with_export_date_override

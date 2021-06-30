@@ -12,30 +12,30 @@ module AuroraBootstrapper
     
     # ENV is string to string dictionary
     def export_date_override
-      done_datetime_str = nil
+      datetime_subfolder_str = nil
 
       if ENV.key?('EXPORT_DATE_OVERRIDE')
         now = Date.today
         
         # expiration time is 30 days
         for i in 1..30
-          done_datetime_str = check_db_dump_done_for_one_day( datetime: (now-i))
-          unless done_datetime_str.nil?
+          datetime_subfolder_str = check_db_dump_done_for_one_day( datetime: (now-i))
+          unless datetime_subfolder_str.nil?
             break
           end
         end
 
         # the first run for the given db partition
-        if done_datetime_str.nil?
-          done_datetime_str = now.strftime("%Y-%m-%d")
+        if datetime_subfolder_str.nil?
+          datetime_subfolder_str = now.strftime("%Y-%m-%d")
         end
       end
 
-      done_datetime_str
+      datetime_subfolder_str
     end
 
     def check_db_dump_done_for_one_day( datetime: )
-      done_datetime_str = nil
+      datetime_subfolder_str = nil
       prefix = [ bucket_path, datetime.strftime("%Y-%m-%d") ].join( '/' )
 
       resp = client.list_objects_v2({
@@ -44,10 +44,10 @@ module AuroraBootstrapper
       })
 
       if parse_resp(resp: resp)
-        done_datetime_str = datetime.strftime("%Y-%m-%d")
+        datetime_subfolder_str = datetime.strftime("%Y-%m-%d")
       end
       
-      done_datetime_str
+      datetime_subfolder_str
     end
 
     def parse_resp( resp: )
