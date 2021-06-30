@@ -30,7 +30,7 @@ class NotifierTest < Minitest::Test
 
   def test_export_date_override
     AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( @stub_client )
-    assert_equal DateTime.now.strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date_override
+    assert_equal (DateTime.now-1).strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date_override
   end
 
   def test_no_export_date_with_export_date_override
@@ -39,7 +39,7 @@ class NotifierTest < Minitest::Test
 
     AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( @stub_client )
 
-    assert_equal DateTime.now.strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date
+    assert_equal (DateTime.now-1).strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date
     ENV["EXPORT_DATE"] = export_date
   end
 
