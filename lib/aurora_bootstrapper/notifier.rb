@@ -21,11 +21,8 @@ module AuroraBootstrapper
         exists_export? date: today-days_ago
       end
       
-      if days_ago.nil? || days_ago == 0
-        today.strftime( DATE_FORMAT )
-      else
-        ( today - days_ago.to_i + 1).strftime( DATE_FORMAT )
-      end
+      converted_days_ago = (days_ago.nil? || days_ago.to_i == 0) ? 1 : days_ago.to_i
+      ( today - converted_days_ago + 1).strftime( DATE_FORMAT )
     end
 
     def exists_export?( date: )
@@ -36,10 +33,6 @@ module AuroraBootstrapper
         prefix: prefix }).contents.find do | object | 
           object.key.include? "DONE"
         end
-
-      if found_object.nil?
-        AuroraBootstrapper.logger.info( message: "No objects in bucket '#{bucket}/#{prefix}'." )
-      end
 
       !found_object.nil?
     end

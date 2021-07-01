@@ -44,11 +44,7 @@ class NotifierTest < Minitest::Test
     })
 
     AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( local_stub_client )
-    with_logger PutsLogger.new do
-      assert_output( /No objects in bucket/ ) do
-        assert !AuroraBootstrapper::Notifier.new(s3_path: @bukkit).exists_export?(date: DateTime.now-1)
-      end
-    end
+    assert !AuroraBootstrapper::Notifier.new(s3_path: @bukkit).exists_export?(date: DateTime.now-1)
   end
 
   def test_exists_export_without_done_file
