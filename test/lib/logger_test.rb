@@ -3,18 +3,20 @@ require 'test_helper'
 class LoggerTest < Minitest::Test
 
   def test_severeties_with_rollbar_token_from_env
-    local_logger = AuroraBootstrapper::Logger.new( '/dev/null' )
-    [ :fatal, :error, :warn, :info, :debug ].each do |severity|
-      local_logger.send severity, message: "hello", error: IOError.new
+    ENV.stub(:key?, true) do 
+      local_logger = AuroraBootstrapper::Logger.new( '/dev/null' )
+      [ :fatal, :error, :warn, :info, :debug ].each do |severity|
+        local_logger.send severity, message: "hello", error: IOError.new
+      end
     end
   end
 
   def test_severeties_with_rollbar_token_from_file
-    ENV.delete("ROLLBAR_TOKEN")
-    local_logger = AuroraBootstrapper::Logger.new( '/dev/null' )
-    [ :fatal, :error, :warn, :info, :debug ].each do |severity|
-      local_logger.send severity, message: "hello", error: IOError.new
+    ENV.stub(:key?, false) do 
+      local_logger = AuroraBootstrapper::Logger.new( '/dev/null' )
+      [ :fatal, :error, :warn, :info, :debug ].each do |severity|
+        local_logger.send severity, message: "hello", error: IOError.new
+      end
     end
-    ENV['ROLLBAR_TOKEN']=nil
   end
 end
