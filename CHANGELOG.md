@@ -1,4 +1,8 @@
 # Changelog
+## Unreleased
+- list
+- of
+- changes
 
 ## 0.2.3
 - [#16](https://github.com/gaorlov/aurora-bootstrap/pull/16) - Pass in s3path to Notifier

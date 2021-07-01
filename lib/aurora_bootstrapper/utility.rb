@@ -2,20 +2,22 @@ module AuroraBootstrapper
   class Utility
     class << self
       def db_pass
-        ENV.fetch( 'DB_PASS' ) do
-          File.open( ENV.fetch( 'DB_CRED_FILE' ) ).read
-        end
+        from_env 'DB_PASS'
       end
-
+          
       def db_user
-        ENV.fetch( 'DB_USER' ) do
-          File.open( ENV.fetch( 'DB_USER_FILE' ) ).read
-        end
+        from_env 'DB_USER'
       end
-
+        
       def rollbar_token
-        ENV.fetch( 'ROLLBAR_TOKEN' ) do
-          File.open( ENV.fetch( 'ROLLBAR_TOKEN_FILE' ) ).read
+        from_env 'ROLLBAR_TOKEN'
+      end
+          
+      private
+          
+      def from_env( var )
+        ENV.fetch( var ) do
+          File.open( ENV.fetch( "#{var}_FILE" ) ).read
         end
       end
     end
