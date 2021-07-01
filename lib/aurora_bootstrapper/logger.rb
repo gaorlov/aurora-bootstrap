@@ -5,7 +5,7 @@ require "multi_json"
 module AuroraBootstrapper
   class Logger
     Rollbar.configure do |config|
-      config.access_token = Utility.get_rollbar_token
+      config.access_token = Utility.rollbar_token
     end
 
     ROLLBAR_SEVERITY = { error: :error,

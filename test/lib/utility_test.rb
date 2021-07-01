@@ -3,32 +3,32 @@ require 'test_helper'
 class UtilityTest < Minitest::Test
 
   def test_db_user_from_env
-    assert_equal 'root', AuroraBootstrapper::Utility.get_db_user
+    assert_equal 'root', AuroraBootstrapper::Utility.db_user
   end
 
   def test_db_user_from_file
-    ENV.stub(:key?, false) do 
-      assert_equal 'user', AuroraBootstrapper::Utility.get_db_user
-    end
+    ENV.delete('DB_USER')
+    assert_equal 'user', AuroraBootstrapper::Utility.db_user
+    ENV['DB_USER'] = 'root'
   end
 
   def test_db_pass_from_env
-    assert_equal 'root', AuroraBootstrapper::Utility.get_db_pass
+    assert_equal 'root', AuroraBootstrapper::Utility.db_pass
   end
 
   def test_db_pass_from_file
-    ENV.stub(:key?, false) do 
-      assert_equal 'pass', AuroraBootstrapper::Utility.get_db_pass
-    end
+    ENV.delete('DB_PASS')
+    assert_equal 'pass', AuroraBootstrapper::Utility.db_pass
+    ENV['DB_PASS'] = 'root'
   end
 
   def test_rollbar_token_from_env
-    assert_equal '', AuroraBootstrapper::Utility.get_rollbar_token
+    assert_equal '', AuroraBootstrapper::Utility.rollbar_token
   end
 
   def test_rollbar_token_from_file
-    ENV.stub(:key?, false) do 
-      assert_equal 'rollbar', AuroraBootstrapper::Utility.get_rollbar_token
-    end
+    ENV.delete('ROLLBAR_TOKEN')
+    assert_equal 'rollbar', AuroraBootstrapper::Utility.rollbar_token
+    ENV['ROLLBAR_TOKEN'] = ''
   end
 end
