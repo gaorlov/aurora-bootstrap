@@ -12,59 +12,48 @@ module AuroraBootstrapper
     
     # ENV is string to string dictionary
     def export_date_override
-      datetime_subfolder_str = nil
+      date_override = nil
 
       if ENV.key?('EXPORT_DATE_OVERRIDE')
         now = Date.today
-        
+
         # expiration time is 30 days
         for i in 1..30
-          datetime_subfolder_str = check_db_dump_done_for_one_day( datetime: (now-i))
-          unless datetime_subfolder_str.nil?
+          if exists_db_dump_done_for_one_day?( date: (now-i))
+            date_override = convert_date_to_string(date: (now-i))
             break
           end
         end
 
         # the first run for the given db partition
-        if datetime_subfolder_str.nil?
-          datetime_subfolder_str = now.strftime("%Y-%m-%d")
+        if date_override.nil?
+          date_override = convert_date_to_string(date: now)
         end
       end
 
-      datetime_subfolder_str
+      date_override
     end
 
-    def check_db_dump_done_for_one_day( datetime: )
-      datetime_subfolder_str = nil
-      prefix = [ bucket_path, datetime.strftime("%Y-%m-%d") ].join( '/' )
+    def exists_db_dump_done_for_one_day?( date: )
+      prefix = [ bucket_path, convert_date_to_string(date: date) ].join( '/' )
 
       resp = client.list_objects_v2({
         bucket: bucket,
         prefix: prefix
       })
 
-      if parse_resp(resp: resp)
-        datetime_subfolder_str = datetime.strftime("%Y-%m-%d")
-      end
-      
-      datetime_subfolder_str
-    end
-
-    def parse_resp( resp: )
       objects = resp.contents
-      exists_done_file = false
       if objects.count.zero?
         AuroraBootstrapper.logger.info( message: "No objects in bucket '#{bucket}/#{prefix}'." )
       else
         objects.each do |object|
           if object.key.include? "DONE"
-            exists_done_file = true
-            break
+            return true
           end
         end
       end
 
-      exists_done_file
+      return false
     end
 
     def notify
@@ -78,6 +67,10 @@ module AuroraBootstrapper
     end
     
     protected
+
+    def convert_date_to_string( date: )
+      date.strftime("%Y-%m-%d")
+    end
     
     def region
       @region ||= ENV.fetch( 'REGION', 'us-west-2' )
