@@ -2,3 +2,5 @@ coverage
 .bundle
 vendor
 job.yml
+lib/.DS_Store
+test/.DS_Store
