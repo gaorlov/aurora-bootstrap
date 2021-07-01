@@ -16,10 +16,12 @@ blacklisted_tables = ENV.fetch "BLACKLISTED_TABLES", ""
 whitelisted_tables = ENV.fetch "WHITELISTED_TABLES", ""
 blacklisted_fields = ENV.fetch "BLACKLISTED_FIELDS", ""
 
+db_pass = ENV.fetch( 'DB_PASS', File.open(ENV.fetch( 'DB_CRED_FILE' ), &:readline))
+
 client    = ConnectionPool::Wrapper.new(size: 15, timeout: 3) do
               Mysql2::Client.new( host: ENV.fetch( "DB_HOST" ),
                               username: ENV.fetch( "DB_USER" ),
-                              password: ENV.fetch( "DB_PASS" ),
+                              password: db_pass,
                           init_command: "SET @@SESSION.MAX_EXECUTION_TIME=31536000")
             end
 
