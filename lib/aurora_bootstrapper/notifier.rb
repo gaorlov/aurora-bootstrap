@@ -19,22 +19,20 @@ module AuroraBootstrapper
       today = Date.today
       days_ago = (0..30).find do | days_ago |
         exists_export? date: today-days_ago
-      end
-      
-      converted_days_ago = (days_ago.nil? || days_ago.to_i == 0) ? 1 : days_ago.to_i
-      ( today - converted_days_ago + 1).strftime( DATE_FORMAT )
+      end.to_i
+
+      days_ago -= 1 unless days_ago.zero?
+      ( today - days_ago ).strftime( DATE_FORMAT )
     end
 
     def exists_export?( date: )
       prefix = [ bucket_path, date.strftime( DATE_FORMAT ) ].join( '/' )
 
-      found_object = client.list_objects_v2({ 
+      client.list_objects_v2({ 
         bucket: bucket,
         prefix: prefix }).contents.find do | object | 
           object.key.include? "DONE"
         end
-
-      !found_object.nil?
     end
 
     def notify

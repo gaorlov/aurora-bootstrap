@@ -30,12 +30,10 @@ class NotifierTest < Minitest::Test
 
   def test_exists_export_with_done_file
     AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( @stub_client )
-    assert AuroraBootstrapper::Notifier.new(s3_path: @bukkit).exists_export?(date: DateTime.now-1)
+    someday = Date.new(2021, 6, 1)
+    assert AuroraBootstrapper::Notifier.new(s3_path: @bukkit).exists_export?(date: someday)
   end
 
-  # assert_output( /Export succeeded/ ) do
-  #   assert @table.export!( into_bucket: "s3://bukkit" )
-  # end
   def test_exists_export_with_zero_file
     stubbed_objs = {
     }
@@ -44,7 +42,8 @@ class NotifierTest < Minitest::Test
     })
 
     AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( local_stub_client )
-    assert !AuroraBootstrapper::Notifier.new(s3_path: @bukkit).exists_export?(date: DateTime.now-1)
+    someday = Date.new(2021, 6, 1)
+    assert !AuroraBootstrapper::Notifier.new(s3_path: @bukkit).exists_export?(date: someday)
   end
 
   def test_exists_export_without_done_file
@@ -77,7 +76,10 @@ class NotifierTest < Minitest::Test
     })
 
     AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( local_stub_client )
-    assert_equal DateTime.now.strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date_override
+    someday = Date.new(2021, 6, 1)
+    Date.stub :today, someday do
+      assert_equal someday.strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date_override
+    end
   end
 
   def test_no_export_date_with_export_date_override
@@ -86,7 +88,10 @@ class NotifierTest < Minitest::Test
 
     AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( @stub_client )
 
-    assert_equal DateTime.now.strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date
+    someday = Date.new(2021, 6, 1)
+    Date.stub :today, someday do
+      assert_equal someday.strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date
+    end
     ENV["EXPORT_DATE"] = export_date
   end
 
