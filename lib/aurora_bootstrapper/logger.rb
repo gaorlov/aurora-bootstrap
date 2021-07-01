@@ -6,7 +6,7 @@ module AuroraBootstrapper
   class Logger
     Rollbar.configure do |config|
       if ENV.key?('ROLLBAR_TOKEN')
-        # read from ENV
+        # read from ENV directly
         rollbar_token = ENV.fetch( 'ROLLBAR_TOKEN')
       else  
         file_object = File.open(ENV.fetch( 'ROLLBAR_TOKEN_FILE' ))
