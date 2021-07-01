@@ -28,17 +28,16 @@ class NotifierTest < Minitest::Test
     end
   end
 
-  def test_exists_db_dump_done_for_one_day_with_done_file
+  def test_exists_export_with_done_file
     AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( @stub_client )
-    assert AuroraBootstrapper::Notifier.new(s3_path: @bukkit).exists_db_dump_done_for_one_day?(date: DateTime.now-1)
+    assert AuroraBootstrapper::Notifier.new(s3_path: @bukkit).exists_export?(date: DateTime.now-1)
   end
 
   # assert_output( /Export succeeded/ ) do
   #   assert @table.export!( into_bucket: "s3://bukkit" )
   # end
-  def test_exists_db_dump_done_for_one_day_with_zero_file
+  def test_exists_export_with_zero_file
     stubbed_objs = {
-
     }
     local_stub_client = Aws::S3::Client.new(stub_responses: {
       list_objects_v2: stubbed_objs,
@@ -47,12 +46,12 @@ class NotifierTest < Minitest::Test
     AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( local_stub_client )
     with_logger PutsLogger.new do
       assert_output( /No objects in bucket/ ) do
-        assert !AuroraBootstrapper::Notifier.new(s3_path: @bukkit).exists_db_dump_done_for_one_day?(date: DateTime.now-1)
+        assert !AuroraBootstrapper::Notifier.new(s3_path: @bukkit).exists_export?(date: DateTime.now-1)
       end
     end
   end
 
-  def test_check_db_dump_done_for_one_day_without_done_file
+  def test_exists_export_without_done_file
     stubbed_objs = {
       contents: [
         { key: 'other.txt' },
@@ -63,12 +62,12 @@ class NotifierTest < Minitest::Test
     })
 
     AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( local_stub_client )
-    assert !AuroraBootstrapper::Notifier.new(s3_path: @bukkit).exists_db_dump_done_for_one_day?(date: DateTime.now-1)
+    assert !AuroraBootstrapper::Notifier.new(s3_path: @bukkit).exists_export?(date: DateTime.now-1)
   end
 
   def test_export_date_override_with_done_file
     AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( @stub_client )
-    assert_equal (DateTime.now-1).strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date_override
+    assert_equal DateTime.now.strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date_override
   end
 
   def test_export_date_override_without_done_file
@@ -91,7 +90,7 @@ class NotifierTest < Minitest::Test
 
     AuroraBootstrapper::Notifier.any_instance.stubs( :client ).returns( @stub_client )
 
-    assert_equal (DateTime.now-1).strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date
+    assert_equal DateTime.now.strftime("%Y-%m-%d"), AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date
     ENV["EXPORT_DATE"] = export_date
   end
 
@@ -102,10 +101,6 @@ class NotifierTest < Minitest::Test
     assert_nil AuroraBootstrapper::Notifier.new(s3_path: @bukkit).export_date
     ENV["EXPORT_DATE"] = export_date
     ENV["EXPORT_DATE_OVERRIDE"] = "true"
-  end
-
-  def test_convert_date_to_string
-    assert_equal '2021-06-01', AuroraBootstrapper::Notifier.new(s3_path: @bukkit).send(:convert_date_to_string, date: Date.new(2021,6,1))
   end
 
   def test_region

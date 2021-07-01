@@ -2,6 +2,8 @@ require 'aws-sdk-s3'
 
 module AuroraBootstrapper
   class Notifier
+    DATE_FORMAT = "%Y-%m-%d"
+
     def initialize( s3_path: )
       @s3_path = s3_path
     end
@@ -12,48 +14,34 @@ module AuroraBootstrapper
     
     # ENV is string to string dictionary
     def export_date_override
-      date_override = nil
+      return nil unless ENV.key?('EXPORT_DATE_OVERRIDE')
 
-      if ENV.key?('EXPORT_DATE_OVERRIDE')
-        now = Date.today
-
-        # expiration time is 30 days
-        for i in 1..30
-          if exists_db_dump_done_for_one_day?( date: (now-i))
-            date_override = convert_date_to_string(date: (now-i))
-            break
-          end
-        end
-
-        # the first run for the given db partition
-        if date_override.nil?
-          date_override = convert_date_to_string(date: now)
-        end
+      today = Date.today
+      days_ago = (0..30).find do | days_ago |
+        exists_export? date: today-days_ago
       end
-
-      date_override
+      
+      if days_ago.nil? || days_ago == 0
+        today.strftime( DATE_FORMAT )
+      else
+        ( today - days_ago.to_i + 1).strftime( DATE_FORMAT )
+      end
     end
 
-    def exists_db_dump_done_for_one_day?( date: )
-      prefix = [ bucket_path, convert_date_to_string(date: date) ].join( '/' )
+    def exists_export?( date: )
+      prefix = [ bucket_path, date.strftime( DATE_FORMAT ) ].join( '/' )
 
-      resp = client.list_objects_v2({
+      found_object = client.list_objects_v2({ 
         bucket: bucket,
-        prefix: prefix
-      })
-
-      objects = resp.contents
-      if objects.count.zero?
-        AuroraBootstrapper.logger.info( message: "No objects in bucket '#{bucket}/#{prefix}'." )
-      else
-        objects.each do |object|
-          if object.key.include? "DONE"
-            return true
-          end
+        prefix: prefix }).contents.find do | object | 
+          object.key.include? "DONE"
         end
+
+      if found_object.nil?
+        AuroraBootstrapper.logger.info( message: "No objects in bucket '#{bucket}/#{prefix}'." )
       end
 
-      return false
+      !found_object.nil?
     end
 
     def notify
@@ -67,10 +55,6 @@ module AuroraBootstrapper
     end
     
     protected
-
-    def convert_date_to_string( date: )
-      date.strftime("%Y-%m-%d")
-    end
     
     def region
       @region ||= ENV.fetch( 'REGION', 'us-west-2' )
