@@ -16,8 +16,8 @@ blacklisted_tables = ENV.fetch "BLACKLISTED_TABLES", ""
 whitelisted_tables = ENV.fetch "WHITELISTED_TABLES", ""
 blacklisted_fields = ENV.fetch "BLACKLISTED_FIELDS", ""
 
-db_pass = AuroraBootstrapper::Utility.get_db_pass
-db_user = AuroraBootstrapper::Utility.get_db_user
+db_pass = AuroraBootstrapper::Utility.db_pass
+db_user = AuroraBootstrapper::Utility.db_user
 
 client    = ConnectionPool::Wrapper.new(size: 15, timeout: 3) do
               Mysql2::Client.new( host: ENV.fetch( "DB_HOST" ),
