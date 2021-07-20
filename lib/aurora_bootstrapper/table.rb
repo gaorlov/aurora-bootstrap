@@ -23,14 +23,6 @@ module AuroraBootstrapper
       end
     end
 
-    # def fields_override
-    #   @fields ||= @client.query("DESC `#{ @database_name }`.`#{ @table_name }`").map do | row |
-    #     row[ "Field" ]
-    #   end.reject do | field |
-    #     blacklisted_field?( field )
-    #   end
-    # end
-
     def blacklisted_field?( field )
       @blacklisted_fields.any? do | blacklisted_field |
         # blacklisted fields can be in the format of "field", "table.field" or "database.table.field"
