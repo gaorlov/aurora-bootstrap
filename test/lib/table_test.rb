@@ -32,7 +32,7 @@ class TableTest < Minitest::Test
   end
 
   def test_predefined_fields
-    assert_equal [ "created_at", "updated_at" ], @table.fields
+    assert_equal [ "created_at", "updated_at", "id" ], @table.fields
   end
 
   def test_json_object
@@ -44,7 +44,7 @@ class TableTest < Minitest::Test
   end
 
   def test_json_object_with_predefined_fields
-    assert_equal "JSON_OBJECT( 'database', 'master', 'table', 'users', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT('created_at', `created_at`, 'updated_at', `updated_at` ) )",
+    assert_equal "JSON_OBJECT( 'database', 'master', 'table', 'users', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT('created_at', `created_at`, 'updated_at', `updated_at`, 'id', `id` ) )",
                  @table.json_object
   end
 
