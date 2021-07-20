@@ -9,12 +9,27 @@ module AuroraBootstrapper
     end
 
     def fields
-      @fields ||= @client.query("DESC `#{ @database_name }`.`#{ @table_name }`").map do | row |
-        row[ "Field" ]
-      end.reject do | field |
+      env_fields_str ||= ENV.fetch('FIELDS', '')
+      if env_fields_str.empty?
+        unfiltered_fields ||= @client.query("DESC `#{ @database_name }`.`#{ @table_name }`").map do | row |
+          row[ "Field" ]
+        end
+      else
+        unfiltered_fields ||= env_fields_str.split(",")
+      end
+
+      @fields ||= unfiltered_fields.reject do | field |
         blacklisted_field?( field )
       end
     end
+
+    # def fields_override
+    #   @fields ||= @client.query("DESC `#{ @database_name }`.`#{ @table_name }`").map do | row |
+    #     row[ "Field" ]
+    #   end.reject do | field |
+    #     blacklisted_field?( field )
+    #   end
+    # end
 
     def blacklisted_field?( field )
       @blacklisted_fields.any? do | blacklisted_field |

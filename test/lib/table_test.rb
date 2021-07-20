@@ -25,11 +25,26 @@ class TableTest < Minitest::Test
   end
 
   def test_fields
+    fields_str = ENV.fetch "FIELDS"
+    ENV.delete("FIELDS")
     assert_equal [ "id", "email", "first_name", "last_name" ], @table.fields
+    ENV["FIELDS"] = fields_str
+  end
+
+  def test_predefined_fields
+    assert_equal [ "created_at", "updated_at" ], @table.fields
   end
 
   def test_json_object
+    fields_str = ENV.fetch "FIELDS"
+    ENV.delete("FIELDS")
     assert_equal "JSON_OBJECT( 'database', 'master', 'table', 'users', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT('id', `id`, 'email', `email`, 'first_name', `first_name`, 'last_name', `last_name` ) )",
+                 @table.json_object
+    ENV["FIELDS"] = fields_str
+  end
+
+  def test_json_object_with_predefined_fields
+    assert_equal "JSON_OBJECT( 'database', 'master', 'table', 'users', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT('created_at', `created_at`, 'updated_at', `updated_at` ) )",
                  @table.json_object
   end
 
@@ -38,6 +53,8 @@ class TableTest < Minitest::Test
   end
 
   def test_export_statement
+    fields_str = ENV.fetch "FIELDS"
+    ENV.delete("FIELDS")
     expected = <<~SQL
       SELECT JSON_OBJECT( 'database', 'master', 'table', 'users', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT('id', `id`, 'email', `email`, 'first_name', `first_name`, 'last_name', `last_name` ) )
         FROM `master`.`users`
@@ -46,9 +63,12 @@ class TableTest < Minitest::Test
         OVERWRITE ON
     SQL
     assert_equal expected, @table.export_statement( into_bucket: "s3://bukkit")
+    ENV["FIELDS"] = fields_str
   end
 
   def test_undated_export_statement
+    fields_str = ENV.fetch "FIELDS"
+    ENV.delete("FIELDS")
     @table.instance_variable_set(:@export_date, nil)
     expected = <<~SQL
       SELECT JSON_OBJECT( 'database', 'master', 'table', 'users', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT('id', `id`, 'email', `email`, 'first_name', `first_name`, 'last_name', `last_name` ) )
@@ -58,6 +78,7 @@ class TableTest < Minitest::Test
         OVERWRITE ON
     SQL
     assert_equal expected, @table.export_statement( into_bucket: "s3://bukkit")
+    ENV["FIELDS"] = fields_str
   end
 
   def test_dashed_db_export_statement
@@ -68,7 +89,10 @@ class TableTest < Minitest::Test
         MANIFEST ON
         OVERWRITE ON
     SQL
+    fields_str = ENV.fetch "FIELDS"
+    ENV.delete("FIELDS")
     assert_equal expected, @table2.export_statement( into_bucket: "s3://bukkit")
+    ENV["FIELDS"] = fields_str
   end
 
   def test_export_logs
@@ -102,7 +126,8 @@ class TableTest < Minitest::Test
 
   def test_blacklisting_fields_across_tables
     blacklisted_fields = [ '/pho.*.link/', 'user_id' ]
-
+    fields_str = ENV.fetch "FIELDS"
+    ENV.delete("FIELDS")
     tables = [ AuroraBootstrapper::Table.new( database_name: "user_stuff",
                                                  table_name: "photos",
                                                      client: @client,
@@ -113,6 +138,7 @@ class TableTest < Minitest::Test
                                                      client: @client,
                                          blacklisted_fields: blacklisted_fields ) ]
     assert_equal [["id"], ["id", "link"]], tables.map(&:fields)
+    ENV["FIELDS"] = fields_str
   end
 
   def test_export
